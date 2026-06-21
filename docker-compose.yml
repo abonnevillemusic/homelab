@@ -1,0 +1,45 @@
+services:
+  gitea:
+    image: gitea/gitea:latest
+    container_name: gitea
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - GITEA__database__DB_TYPE=sqlite3
+    restart: unless-stopped
+    networks:
+      - labnet
+    volumes:
+      - gitea-data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    # ports intentionally not exposed publicly;
+    # access via reverse proxy or VPN only
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    networks:
+      - labnet
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer-data:/data
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    restart: unless-stopped
+    networks:
+      - labnet
+    volumes:
+      - uptime-kuma-data:/app/data
+
+networks:
+  labnet:
+    driver: bridge
+
+volumes:
+  gitea-data:
+  portainer-data:
+  uptime-kuma-data:
